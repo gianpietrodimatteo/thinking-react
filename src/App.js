@@ -4,15 +4,21 @@ import "./App.css";
 function ProductCategoryRow({ category }) {
   return (
     <tr>
-      <td>{category}</td>
+      <th colSpan="2">{category}</th>
     </tr>
   );
 }
 
 function ProductRow({ product }) {
+  const name = product.stocked ? (
+    product.name
+  ) : (
+    <span style={{ color: "red" }}>{product.name}</span>
+  );
+
   return (
     <tr>
-      <td> {product.name} </td>
+      <td> {name} </td>
       <td> {product.price} </td>
     </tr>
   );
@@ -46,11 +52,11 @@ function ProductTable({ products }) {
 
 function SearchBar() {
   return (
-    <div>
+    <form>
       <input type="text" placeholder="Search..." />
       <label for="checkbox">Only show products in stock</label>
-      <input id="checkbox" type="checkbox"></input>
-    </div>
+      <input id="checkbox" type="checkbox" />
+    </form>
   );
 }
 
