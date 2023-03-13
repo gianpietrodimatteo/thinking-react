@@ -1,5 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
+import { useState } from "react";
 
 function ProductCategoryRow({ category }) {
   return (
@@ -24,13 +25,26 @@ function ProductRow({ product }) {
   );
 }
 
-function ProductTable({ products }) {
-  const fruits = products
-    .filter((product) => (product.category = "Fruits"))
-    .map((product) => <ProductRow product={product} />);
-  const vegetables = products
-    .filter((product) => (product.category = "vegetables"))
-    .map((product) => <ProductRow product={product} />);
+function ProductTable({ products, filterText, inStockOnly }) {
+  const rows = [];
+  let lastCategory = null;
+
+  const filteredProducts = products
+    .filter((p) => (inStockOnly ? p.stocked : true))
+    .filter((p) => p.name.includes(filterText));
+
+  filteredProducts.forEach((product) => {
+    if (product.category !== lastCategory) {
+      rows.push(
+        <ProductCategoryRow
+          category={product.category}
+          key={product.category}
+        />
+      );
+    }
+    rows.push(<ProductRow product={product} key={product.name} />);
+    lastCategory = product.category;
+  });
 
   return (
     <table>
@@ -40,31 +54,33 @@ function ProductTable({ products }) {
           <th>Price</th>
         </tr>
       </thead>
-      <tbody>
-        <ProductCategoryRow category={"Fruits"} />
-        {fruits}
-        <ProductCategoryRow category={"Vegetables"} />
-        {vegetables}
-      </tbody>
+      <tbody>{rows}</tbody>
     </table>
   );
 }
 
-function SearchBar() {
+function SearchBar(filterText, inStockOnly) {
   return (
     <form>
-      <input type="text" placeholder="Search..." />
-      <label for="checkbox">Only show products in stock</label>
-      <input id="checkbox" type="checkbox" />
+      <input type="text" placeholder="Search..." value={filterText} />
+      <label htmlFor="checkbox"> Only show products in stock</label>
+      <input id="checkbox" type="checkbox" checked={inStockOnly} />
     </form>
   );
 }
 
 function FilterableProductTable({ products }) {
+  const [filterText, setFilterText] = useState("");
+  const [inStockOnly, setInStockOnly] = useState(false);
+
   return (
     <div>
-      <SearchBar />
-      <ProductTable products={products} />
+      <SearchBar filterText={filterText} inStockOnly={inStockOnly} />
+      <ProductTable
+        products={products}
+        filterText={filterText}
+        inStockOnly={inStockOnly}
+      />
     </div>
   );
 }
